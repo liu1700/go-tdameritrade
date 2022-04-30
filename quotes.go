@@ -90,3 +90,27 @@ func (s *QuotesService) GetQuotes(ctx context.Context, symbols string) (*Quotes,
 	return quotes, resp, nil
 }
 
+
+func (s *QuotesService) GetQuotesNoAuth(ctx context.Context, apiKey string, symbols string) (*Quotes, *Response, error) {
+	u := fmt.Sprintf("marketdata/quotes")
+	if symbols == "" {
+		return nil, nil, fmt.Errorf("no symbols present")
+	}
+	u = fmt.Sprintf("%s?apikey=%s&symbol=%s", u, apiKey, symbols)
+
+	req, err := s.client.NewRequest("GET", u, nil)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	quotes := new(Quotes)
+
+	resp, err := s.client.Do(ctx, req, quotes)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return quotes, resp, nil
+}
+
